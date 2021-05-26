@@ -1,15 +1,18 @@
 import { useTodosDispatch } from "../context/TodosDispatchContext"
+import { useUser } from "../context/UserContext"
 import { useIsMounted } from "../hooks/useIsMounted"
 
 const ToggleTodo = ({ todo }) => {
   const dispatch = useTodosDispatch()
   const isMounted = useIsMounted()
+  const { user, userDispatch } = useUser()
 
   const toggleCompleteTodo = () => {
     fetch(`${process.env.REACT_APP_API_URL}/todos/${todo.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + user.access_token,
       },
       body: JSON.stringify({
         ...todo,
@@ -17,8 +20,11 @@ const ToggleTodo = ({ todo }) => {
       }),
     })
       .then((response) => {
+        if (response.status === 401) {
+          userDispatch({ type: "LOGOUT" })
+        }
         if (!response.ok) {
-          throw new Error(`Something went wrong: ${response.textStatus}`)
+          throw new Error(`Something went wrong: ${response.statusText}`)
         }
         return response.json()
       })

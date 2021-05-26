@@ -10,12 +10,14 @@ export const todosReducer = (state, action) => {
     case "DELETE":
       return {
         ...state,
+        error: "",
         todos: state.todos.filter((el) => el.id !== action.payload.id),
         loading: false,
       }
     case "TOGGLE":
       return {
         ...state,
+        error: "",
         todos: state.todos.map((el) => {
           if (el.id === action.payload.id) {
             return {
